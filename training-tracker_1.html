@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Training">
+<title>Mein Training</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0a0a0a; --surface:#161616; --surface2:#1f1f1f;
+  --border:rgba(255,255,255,0.07); --gold:#ff4d2e; --gold2:#ff8c42;
+  --violet:#3ec6e0; --text:#f5f5f5; --muted:#6b6b6b;
+  --success:#4ade80; --danger:#ef4444; --warning:#fbbf24;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;}
+#app{height:100vh;display:flex;flex-direction:column;max-width:520px;margin:0 auto;position:relative;}
+#content{flex:1;overflow-y:auto;padding:0 0 100px;-webkit-overflow-scrolling:touch;}
+#content::-webkit-scrollbar{display:none;}
+nav{position:absolute;bottom:0;left:0;right:0;background:rgba(11,11,17,0.97);border-top:1px solid var(--border);display:flex;padding:8px 0 max(12px,env(safe-area-inset-bottom));backdrop-filter:blur(20px);z-index:100;}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;transition:color 0.2s;padding:4px 0;}
+.nb .ico{font-size:22px;line-height:1;}
+.nb.on{color:var(--gold);}
+.hdr{padding:max(44px,env(safe-area-inset-top)) 20px 20px;background:radial-gradient(ellipse at 50% -20%,rgba(255,77,46,0.15) 0%,transparent 70%);text-align:center;}
+.hdr-date{font-size:11px;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px;}
+.hdr-title{font-family:'Anton',sans-serif;font-size:34px;font-weight:400;color:var(--gold2);text-transform:uppercase;letter-spacing:0.04em;}
+.hdr-sub{font-size:13px;color:var(--muted);margin-top:3px;}
+.card{margin:0 14px 10px;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:18px;position:relative;}
+.card::after{content:'';position:absolute;top:0;left:20px;right:20px;height:2px;background:linear-gradient(90deg,transparent,rgba(255,77,46,0.4),transparent);}
+.ct{font-size:11px;font-weight:700;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:14px;}
+.fl{font-size:13px;color:#9090a8;margin-bottom:7px;display:block;}
+.fg{margin-bottom:14px;}
+textarea,input[type=text],input[type=date]{width:100%;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:11px;padding:11px 13px;color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;resize:none;line-height:1.55;outline:none;transition:border-color 0.2s;-webkit-appearance:none;}
+textarea:focus,input[type=text]:focus,input[type=date]:focus{border-color:rgba(201,169,110,0.35);}
+input[type=date]{color-scheme:dark;}
+.stags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px;}
+.stag{padding:8px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-size:13px;cursor:pointer;transition:all 0.15s;font-family:'DM Sans',sans-serif;user-select:none;}
+.stag.on{background:linear-gradient(135deg,rgba(255,77,46,0.2),rgba(255,140,66,0.15));border-color:var(--gold);color:var(--gold2);font-weight:600;}
+.hcards{display:flex;gap:10px;}
+.hcard{flex:1;padding:16px;border-radius:16px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;text-align:center;transition:all 0.2s;}
+.hcard:active{transform:scale(0.97);}
+.hcard.done{background:rgba(255,77,46,0.1);border-color:rgba(255,77,46,0.4);}
+.hcard-ico{font-size:28px;margin-bottom:6px;}
+.hcard-lbl{font-size:12px;color:var(--muted);}
+.hcard.done .hcard-lbl{color:var(--gold2);font-weight:600;}
+.streak{display:inline-flex;align-items:center;gap:6px;background:rgba(255,77,46,0.1);border:1px solid rgba(255,77,46,0.3);border-radius:20px;padding:5px 13px;font-size:13px;font-weight:600;color:var(--gold2);margin:0 14px 10px;text-transform:uppercase;letter-spacing:0.05em;}
+.sbtn{width:calc(100% - 28px);margin:6px 14px 0;padding:16px;border:none;border-radius:12px;font-size:15px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;letter-spacing:0.08em;text-transform:uppercase;transition:all 0.2s;}
+.sbtn:active{opacity:0.85;transform:scale(0.98);}
+.sbtn-m{background:linear-gradient(135deg,#ff4d2e,#ff8c42);color:#fff;box-shadow:0 4px 16px rgba(255,77,46,0.35);}
+.sbtn-export{background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
+.cgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:8px;width:100%;box-sizing:border-box;}
+.cdn{font-size:10px;color:var(--muted);text-align:center;padding:2px 0;font-weight:600;}
+.cday{width:100%;aspect-ratio:1;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;color:var(--muted);background:var(--surface2);gap:1px;cursor:pointer;transition:all 0.15s;-webkit-tap-highlight-color:transparent;min-width:0;overflow:hidden;}
+.cday.cm{background:rgba(255,77,46,0.15);color:var(--gold2);font-weight:600;}
+.cday.ct{border:2px solid var(--gold);}
+.cday.ce{background:none;cursor:default;}
+.cday:not(.ce):active{opacity:0.7;transform:scale(0.93);}
+.cdot{width:3px;height:3px;border-radius:50%;background:var(--gold);}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:0 14px 10px;}
+.sbox{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center;}
+.sval{font-family:'Anton',sans-serif;font-size:30px;font-weight:600;color:var(--gold2);}
+.slbl{font-size:11px;color:var(--muted);margin-top:3px;}
+.recent{background:var(--surface2);border-radius:12px;padding:12px;margin-bottom:8px;}
+.rdate{font-size:11px;color:var(--muted);margin-bottom:7px;}
+.pills{display:flex;gap:5px;flex-wrap:wrap;}
+.pill{padding:3px 9px;border-radius:20px;font-size:11px;background:rgba(201,169,110,0.1);color:var(--gold2);}
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 20px;font-size:13px;color:var(--text);opacity:0;transition:all 0.3s;pointer-events:none;white-space:nowrap;z-index:300;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.gap{height:12px;}
+.summary-box{background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:16px;font-family:'DM Sans',monospace;font-size:13px;line-height:1.8;color:var(--text);white-space:pre-wrap;}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="toast" id="toast"></div>
+  <div id="content">
+    <div id="v-home"></div>
+    <div id="v-eintrag" style="display:none"></div>
+    <div id="v-kal" style="display:none"></div>
+    <div id="v-stats" style="display:none"></div>
+  </div>
+  <nav>
+    <button class="nb on" onclick="go('home')" id="n-home"><span class="ico">🏠</span>Home</button>
+    <button class="nb" onclick="go('eintrag')" id="n-eintrag"><span class="ico">💪</span>Eintrag</button>
+    <button class="nb" onclick="go('kal')" id="n-kal"><span class="ico">📅</span>Kalender</button>
+    <button class="nb" onclick="go('stats')" id="n-stats"><span class="ico">📊</span>Stats</button>
+  </nav>
+</div>
+
+<script>
+let currentView = 'home';
+let editingDate = null;
+const TRAININGS = ['Push','Pull','Beine','Brust','Rücken','Schulter/Nacken','Arme','Cardio','Ruhetag'];
+
+const SPORT_QUOTES = [
+  'No Pain, No Gain.',
+  'Der Schmerz, den du heute fühlst, ist die Stärke, die du morgen spürst.',
+  'Disziplin schlägt Motivation.',
+  'Champions trainieren, wenn niemand zuschaut.',
+  'Dein Körper kann fast alles. Es ist dein Kopf, den du überzeugen musst.',
+  'Harte Arbeit schlägt Talent, wenn Talent nicht hart arbeitet.',
+  'Es ist nicht der Berg, den du besiegst, sondern dich selbst.',
+  'Erfolg ist die Summe kleiner Anstrengungen, jeden Tag wiederholt.',
+  'Schmerzen sind temporär. Aufgeben dauert ewig.',
+  'Du wirst es nicht bereuen, heute trainiert zu haben.',
+  'Sei stärker als deine stärkste Ausrede.',
+  'Die einzige schlechte Trainingseinheit ist die, die nicht stattfindet.',
+  'Push yourself, because no one else is going to do it for you.',
+  'Großartige Dinge kommen nicht aus der Komfortzone.',
+  'Wake up. Work out. Look hot. Kick ass.',
+  'Stärke kommt nicht aus dem Körper. Sie kommt aus dem Willen.',
+  'Der Unterschied zwischen Versuch und Triumph ist ein bisschen Mehr.',
+  'Train insane or remain the same.',
+];
+
+function getDailyQuote() {
+  const td = today();
+  const seed = parseInt(td.replace(/-/g,'')) % SPORT_QUOTES.length;
+  return SPORT_QUOTES[seed];
+}
+
+const $ = id => document.getElementById(id);
+const today = () => new Date().toISOString().split('T')[0];
+const fmtDE = s => { try { return new Date(s+'T12:00:00').toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'short'}); } catch(e){return s;} };
+const fmtFull = (s) => { try { return new Date((s||today())+'T12:00:00').toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); } catch(e){return s;} };
+
+function loadEntries() {
+  try { const r = localStorage.getItem('t_entries'); return r ? JSON.parse(r) : {}; } catch(e) { return {}; }
+}
+function saveEntries(entries) {
+  try { localStorage.setItem('t_entries', JSON.stringify(entries)); } catch(e) {}
+}
+
+function toast(msg, ms=2500) {
+  const el = $('toast'); el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), ms);
+}
+
+function go(v) {
+  currentView = v;
+  editingDate = null;
+  const views = ['home','eintrag','kal','stats'];
+  views.forEach(x => $('v-'+x).style.display = x===v ? 'block' : 'none');
+  views.forEach(x => { const nb=$('n-'+x); if(nb) nb.classList.toggle('on', x===v); });
+  $('content').scrollTop = 0;
+  if(v==='home') rHome();
+  if(v==='eintrag') rEintrag(today());
+  if(v==='kal') rKal();
+  if(v==='stats') rStats();
+}
+
+function rHome() {
+  const entries = loadEntries();
+  const td = today(), te = entries[td];
+  const gr = getDailyQuote();
+  const st = calcStreak(entries);
+  const dates = Object.keys(entries).sort((a,b)=>b.localeCompare(a)).slice(0,3);
+
+  $('v-home').innerHTML = `
+    <div class="hdr">
+      <div class="hdr-date">${fmtFull()}</div>
+      <div class="hdr-title" style="font-size:22px;line-height:1.3;text-transform:none;letter-spacing:0.01em;padding:0 4px">"${gr}"</div>
+      <div class="hdr-sub" style="margin-top:8px">🏋️ Dein Trainings-Tracker</div>
+    </div>
+    ${st>0?`<div class="streak">🔥 ${st} Tag${st>1?'e':''} in Folge</div>`:''}
+    <div class="gap"></div>
+    <div class="card">
+      <div class="ct">Heute</div>
+      <div class="hcards">
+        <div class="hcard ${te?'done':''}" onclick="go('eintrag')">
+          <div class="hcard-ico">💪</div>
+          <div class="hcard-lbl">${te?'✓ Ausgefüllt':'Training eintragen'}</div>
+        </div>
+        <div class="hcard" onclick="go('kal')">
+          <div class="hcard-ico">📅</div>
+          <div class="hcard-lbl">Kalender</div>
+        </div>
+      </div>
+    </div>
+    ${dates.length?`<div class="card"><div class="ct">Letzte Einträge</div>
+      ${dates.map(d=>{const e=entries[d];return`<div class="recent" style="cursor:pointer" onclick="showSummary('${d}')">
+        <div class="rdate">${fmtDE(d)}</div>
+        <div class="pills">
+          ${e.gewicht?`<span class="pill">⚖️ ${e.gewicht}</span>`:''}
+          ${(e.trainingTags||[]).map(t=>`<span class="pill">💪 ${t}</span>`).join('')}
+          ${e.kardio?`<span class="pill">🏃 ${e.kardio}</span>`:''}
+        </div>
+      </div>`;}).join('')}
+    </div>`:''}
+    <div class="card">
+      <div class="ct">Daten exportieren</div>
+      <button class="sbtn sbtn-m" onclick="exportJSON()" style="margin:0 0 8px">📦 Export als JSON</button>
+      <button class="sbtn sbtn-export" onclick="exportCSV()" style="margin:4px 0 0">📊 Export als CSV</button>
+    </div>
+    <div style="height:10px"></div>
+  `;
+}
+
+function rEintrag(dateStr) {
+  editingDate = dateStr;
+  const entries = loadEntries();
+  const ex = entries[dateStr] || {};
+  const isToday = dateStr === today();
+  window._trainTags = [...(ex.trainingTags||[])];
+
+  $('v-eintrag').innerHTML = `
+    <div class="hdr">
+      <div class="hdr-date">${isToday?'HEUTE':fmtFull(dateStr)}</div>
+      <div class="hdr-title">💪 Trainingseintrag</div>
+    </div>
+    <div class="card">
+      <div class="ct">Datum</div>
+      <input type="date" id="e-datum" value="${dateStr}" max="${today()}" onchange="changeDate(this.value)">
+    </div>
+    <div class="card">
+      <div class="ct">Gewicht</div>
+      <input type="text" id="e-gewicht" placeholder="z.B. 78.5 kg" value="${ex.gewicht||''}">
+    </div>
+    <div class="card">
+      <div class="ct">Trainingseinheit</div>
+      <div class="stags" id="train-tags">
+        ${TRAININGS.map(t=>`<div class="stag ${window._trainTags.includes(t)?'on':''}" onclick="tTrain('${t}')">${t}</div>`).join('')}
+      </div>
+      <label class="fl">Details (optional)</label>
+      <textarea id="e-training" rows="2" placeholder="z.B. Bankdruecken 4x8, Schraegbankdruecken 3x10...">${ex.training||''}</textarea>
+    </div>
+    <div class="card">
+      <div class="ct">Kardiozeit</div>
+      <input type="text" id="e-kardio" placeholder="z.B. 20 Min Laufband, Stufe 8" value="${ex.kardio||''}">
+    </div>
+    <div class="card">
+      <div class="ct">Wie war das Training?</div>
+      <textarea id="e-trainingq" rows="2" placeholder="Stark, schwach, neue PRs...">${ex.trainingQuali||''}</textarea>
+    </div>
+    <div class="card">
+      <div class="ct">Wohlbefinden</div>
+      <textarea id="e-wohl" rows="2" placeholder="Wie fuehlst du dich heute?">${ex.wohlbefinden||''}</textarea>
+    </div>
+    <div class="card">
+      <div class="ct">Ernaehrung</div>
+      <textarea id="e-ern" rows="2" placeholder="Wie laeuft die Ernaehrung?">${ex.ernaehrung||''}</textarea>
+    </div>
+    <div class="card">
+      <div class="ct">Supplementierung</div>
+      <textarea id="e-supp" rows="2" placeholder="Wie laeuft die Supplementierung?">${ex.supplementierung||''}</textarea>
+    </div>
+    <div class="card">
+      <div class="ct">Weitere Anmerkungen</div>
+      <textarea id="e-notiz" rows="3" placeholder="Sonstiges...">${ex.notizen||''}</textarea>
+    </div>
+    <button class="sbtn sbtn-m" onclick="saveEintrag()">Eintrag speichern</button>
+    <div style="height:20px"></div>
+  `;
+}
+
+function changeDate(newDate) {
+  // Save current tags before re-render
+  rEintrag(newDate);
+}
+
+function tTrain(t) {
+  window._trainTags = window._trainTags || [];
+  if(window._trainTags.includes(t)) window._trainTags = window._trainTags.filter(x=>x!==t);
+  else window._trainTags.push(t);
+  $('train-tags').innerHTML = TRAININGS.map(tr=>`<div class="stag ${window._trainTags.includes(tr)?'on':''}" onclick="tTrain('${tr}')">${tr}</div>`).join('');
+}
+
+function saveEintrag() {
+  const dateStr = $('e-datum')?.value || editingDate || today();
+  const entries = loadEntries();
+  entries[dateStr] = {
+    gewicht: $('e-gewicht')?.value||'',
+    trainingTags: window._trainTags || [],
+    training: $('e-training')?.value||'',
+    kardio: $('e-kardio')?.value||'',
+    trainingQuali: $('e-trainingq')?.value||'',
+    wohlbefinden: $('e-wohl')?.value||'',
+    ernaehrung: $('e-ern')?.value||'',
+    supplementierung: $('e-supp')?.value||'',
+    notizen: $('e-notiz')?.value||'',
+    savedAt: new Date().toISOString()
+  };
+  saveEntries(entries);
+  toast('Eintrag gespeichert');
+  showSummary(dateStr);
+}
+
+function rKal() {
+  const entries=loadEntries();
+  const now=new Date(),y=now.getFullYear(),mo=now.getMonth();
+  const first=new Date(y,mo,1),last=new Date(y,mo+1,0);
+  const startDow=(first.getDay()+6)%7,td=today();
+  const total=Object.keys(entries).length,st=calcStreak(entries);
+
+  let cal='<div class="cgrid">';
+  ['Mo','Di','Mi','Do','Fr','Sa','So'].forEach(d=>cal+=`<div class="cdn">${d}</div>`);
+  for(let i=0;i<startDow;i++) cal+='<div class="cday ce"></div>';
+  for(let d=1;d<=last.getDate();d++){
+    const ds=`${y}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const e=entries[ds];
+    const future=ds>td;
+    cal+=`<div class="cday ${e?'cm':''} ${ds===td?'ct':''}" ${!future?`onclick="openDay('${ds}')"`:''}>${d}${e?'<div class="cdot"></div>':''}</div>`;
+  }
+  cal+='</div>';
+
+  $('v-kal').innerHTML=`
+    <div class="hdr">
+      <div class="hdr-title">Kalender</div>
+      <div class="hdr-sub">${now.toLocaleDateString('de-DE',{month:'long',year:'numeric'})}</div>
+    </div>
+    <div class="card" style="padding:12px 10px">${cal}</div>
+    <div class="sgrid">
+      <div class="sbox"><div class="sval">${total}</div><div class="slbl">Trainings-Tage</div></div>
+      <div class="sbox"><div class="sval">${st}</div><div class="slbl">Tage in Folge</div></div>
+    </div>
+  `;
+}
+
+function openDay(dateStr) {
+  const entries = loadEntries();
+  const e = entries[dateStr];
+  const fmtd = fmtFull(dateStr);
+
+  const modal = document.createElement('div');
+  modal.id = 'day-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:200;display:flex;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch;';
+  modal.innerHTML = `
+    <div style="max-width:520px;margin:0 auto;width:100%;padding:max(20px,env(safe-area-inset-top)) 14px max(80px,env(safe-area-inset-bottom))">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div>
+          <div style="font-size:11px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase">${fmtd}</div>
+          <div style="font-family:'Anton',sans-serif;font-size:24px;color:var(--gold2)">Trainingstag</div>
+        </div>
+        <button onclick="document.getElementById('day-modal').remove()" style="background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:8px 14px;color:var(--muted);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">Schliessen</button>
+      </div>
+      ${e ? `
+      <div class="card" style="margin:0 0 10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div class="ct" style="margin:0">Eintrag</div>
+          <button onclick="document.getElementById('day-modal').remove();go('eintrag');rEintrag('${dateStr}')" style="font-size:12px;color:var(--gold);background:rgba(201,169,110,0.1);border:1px solid rgba(201,169,110,0.3);border-radius:20px;padding:4px 12px;cursor:pointer;font-family:'DM Sans',sans-serif">Bearbeiten</button>
+        </div>
+        ${e.gewicht?`<div style="font-size:11px;color:var(--muted);margin-bottom:3px">Gewicht</div><div style="font-size:14px;color:var(--gold2);margin-bottom:10px">${e.gewicht}</div>`:''}
+        ${(e.trainingTags||[]).length?`<div style="font-size:11px;color:var(--muted);margin-bottom:5px">Trainingseinheit</div><div class="pills" style="margin-bottom:10px">${e.trainingTags.map(t=>`<span class="pill">${t}</span>`).join('')}</div>`:''}
+        ${e.training?`<div style="font-size:11px;color:var(--muted);margin-bottom:3px">Details</div><div style="font-size:13px;color:var(--text);margin-bottom:10px">${e.training}</div>`:''}
+        ${e.kardio?`<div style="font-size:11px;color:var(--muted);margin-bottom:3px">Kardio</div><div style="font-size:13px;color:var(--text);margin-bottom:10px">${e.kardio}</div>`:''}
+        ${e.trainingQuali?`<div style="font-size:11px;color:var(--muted);margin-bottom:3px">Training-Bewertung</div><div style="font-size:13px;color:var(--text);margin-bottom:10px">${e.trainingQuali}</div>`:''}
+        ${e.wohlbefinden?`<div style="font-size:11px;color:var(--muted);margin-bottom:3px">Wohlbefinden</div><div style="font-size:13px;color:var(--text);margin-bottom:10px">${e.wohlbefinden}</div>`:''}
+        ${e.ernaehrung?`<div style="font-size:11px;color:var(--muted);margin-bottom:3px">Ernaehrung</div><div style="font-size:13px;color:var(--text);margin-bottom:10px">${e.ernaehrung}</div>`:''}
+        ${e.supplementierung?`<div style="font-size:11px;color:var(--muted);margin-bottom:3px">Supplementierung</div><div style="font-size:13px;color:var(--text);margin-bottom:10px">${e.supplementierung}</div>`:''}
+        ${e.notizen?`<div style="font-size:11px;color:var(--muted);margin-bottom:3px">Anmerkungen</div><div style="font-size:13px;color:var(--text)">${e.notizen}</div>`:''}
+        <button class="sbtn sbtn-export" onclick="showSummary('${dateStr}')" style="margin:14px 0 0">Zusammenfassung anzeigen</button>
+      </div>` : `
+      <div class="card" style="margin:0 0 10px;text-align:center;padding:24px">
+        <div style="font-size:28px;margin-bottom:8px">💪</div>
+        <div style="color:var(--muted);font-size:13px;margin-bottom:12px">Kein Eintrag</div>
+        <button onclick="document.getElementById('day-modal').remove();go('eintrag');rEintrag('${dateStr}')" class="sbtn sbtn-m" style="margin:0;padding:10px;font-size:13px;width:auto;display:inline-block">+ Nachtragen</button>
+      </div>`}
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+function showSummary(dateStr) {
+  const entries = loadEntries();
+  const e = entries[dateStr];
+  if(!e) return;
+  const fmtd = fmtFull(dateStr);
+
+  const lines = [];
+  lines.push(fmtd);
+  lines.push('Training: ' + ((e.trainingTags||[]).join(', ')||'-'));
+  if(e.training) lines.push('Details: ' + e.training);
+  lines.push('Gewicht: ' + (e.gewicht||'-'));
+  lines.push('Kardio: ' + (e.kardio||'-'));
+  lines.push('Training-Bewertung: ' + (e.trainingQuali||'-'));
+  lines.push('Wohlbefinden: ' + (e.wohlbefinden||'-'));
+  lines.push('Ernaehrung: ' + (e.ernaehrung||'-'));
+  lines.push('Supplementierung: ' + (e.supplementierung||'-'));
+  lines.push('Anmerkungen: ' + (e.notizen||'-'));
+  const text = lines.join('\n');
+
+  const modal = document.createElement('div');
+  modal.id = 'summary-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:210;display:flex;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch;';
+  modal.innerHTML = `
+    <div style="max-width:520px;margin:0 auto;width:100%;padding:max(20px,env(safe-area-inset-top)) 14px max(80px,env(safe-area-inset-bottom))">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div style="font-family:'Anton',sans-serif;font-size:24px;color:var(--gold2)">Zusammenfassung</div>
+        <button onclick="document.getElementById('summary-modal').remove();go('home')" style="background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:8px 14px;color:var(--muted);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">Schliessen</button>
+      </div>
+      <div class="card">
+        <div class="summary-box" id="summary-text">${text}</div>
+        <button class="sbtn sbtn-m" onclick="copySummary()" style="margin:14px 0 0">In Zwischenablage kopieren</button>
+        <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:12px">Oder mache einen Screenshot von oben</div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  window._summaryText = text;
+}
+
+function copySummary() {
+  const text = window._summaryText || '';
+  if(navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(()=>toast('Kopiert!')).catch(()=>fallbackCopy(text));
+  } else fallbackCopy(text);
+}
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text; document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); toast('Kopiert!'); } catch(e) { toast('Kopieren fehlgeschlagen'); }
+  document.body.removeChild(ta);
+}
+
+function rStats() {
+  const entries = loadEntries();
+  const dates = Object.keys(entries).sort((a,b)=>a.localeCompare(b));
+  const total = dates.length;
+
+  const trainCount = {};
+  TRAININGS.forEach(t=>trainCount[t]=0);
+  dates.forEach(d=>{(entries[d].trainingTags||[]).forEach(t=>{trainCount[t]=(trainCount[t]||0)+1;});});
+
+  const weights = dates.filter(d=>entries[d].gewicht).map(d=>({datum:d,gewicht:entries[d].gewicht}));
+  const last10 = weights.slice(-10);
+
+  $('v-stats').innerHTML=`
+    <div class="hdr">
+      <div class="hdr-title">Auswertung</div>
+      <div class="hdr-sub">Dein Trainings-Fortschritt</div>
+    </div>
+    <div class="sgrid">
+      <div class="sbox"><div class="sval">${total}</div><div class="slbl">Trainings-Tage</div></div>
+      <div class="sbox"><div class="sval">${weights.length}</div><div class="slbl">Gewichts-Eintraege</div></div>
+    </div>
+    <div class="card">
+      <div class="ct">Trainingsverteilung</div>
+      ${TRAININGS.map(t=>`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <span style="font-size:13px;color:var(--muted)">${t}</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:80px;height:5px;border-radius:3px;background:rgba(255,255,255,0.06)"><div style="width:${total>0?Math.min(100,trainCount[t]/total*100*3):0}%;height:100%;border-radius:3px;background:var(--gold);opacity:0.7"></div></div>
+          <span style="font-family:'Anton',sans-serif;font-size:18px;color:var(--gold2);min-width:24px;text-align:right">${trainCount[t]}</span>
+        </div>
+      </div>`).join('')}
+    </div>
+    ${last10.length?`<div class="card">
+      <div class="ct">Gewichtsverlauf (letzte ${last10.length})</div>
+      ${last10.map(w=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">
+        <span style="color:var(--muted)">${fmtDE(w.datum)}</span>
+        <span style="color:var(--gold2);font-weight:500">${w.gewicht}</span>
+      </div>`).join('')}
+    </div>`:''}
+    ${!total?'<div class="card" style="text-align:center;padding:32px;color:var(--muted)">Noch keine Eintraege.<br><br>Starte deinen ersten Trainingseintrag!</div>':''}
+    <div style="height:10px"></div>
+  `;
+}
+
+function exportJSON() {
+  const entries = loadEntries();
+  const blob = new Blob([JSON.stringify(entries,null,2)],{type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url;a.download=`training-export-${today()}.json`;a.click();
+  URL.revokeObjectURL(url);
+  toast('JSON Export gestartet');
+}
+
+function exportCSV() {
+  const entries = loadEntries();
+  const rows=[['Datum','Gewicht','Trainingseinheit','Details','Kardio','Training-Bewertung','Wohlbefinden','Ernaehrung','Supplementierung','Anmerkungen']];
+  Object.entries(entries).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([d,e])=>{
+    rows.push([d,e.gewicht||'',(e.trainingTags||[]).join(';'),e.training||'',e.kardio||'',e.trainingQuali||'',e.wohlbefinden||'',e.ernaehrung||'',e.supplementierung||'',e.notizen||'']);
+  });
+  const csv = rows.map(r=>r.map(c=>'"'+(c+'').replace(/"/g,'""')+'"').join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url;a.download=`training-export-${today()}.csv`;a.click();
+  URL.revokeObjectURL(url);
+  toast('CSV Export gestartet');
+}
+
+function calcStreak(entries) {
+  let s=0;
+  for(let i=0;i<365;i++){
+    const d=new Date();d.setDate(d.getDate()-i);
+    const k=d.toISOString().split('T')[0];
+    if(entries[k])s++;else break;
+  }
+  return s;
+}
+
+go('home');
+</script>
+</body>
+</html>
